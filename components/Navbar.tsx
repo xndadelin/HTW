@@ -1,7 +1,15 @@
+"use client"
 import React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+import { useQuery } from "react-query"
+import { getUser } from "@/utils/queries/user/getUser"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { User, LogOut } from "lucide-react"
+import Loading from "@/components/auth/Loading"
+import { logout } from "@/utils/queries/user/logout"
 
 const Item = ({ title, description, href, ...props }: { title: string, description: string, href: string }) => {
     return (
@@ -69,6 +77,9 @@ const items = [
 
 
 export const Navbar = () => {
+
+    const { data: user, isLoading } = useQuery("user", getUser)
+
     return (
         <nav className="container mx-auto flex h-20 w-full items-center justify-between px-4 md:px-6">
             <Link href="/" className="flex items-center gap-2" prefetch={false}>
@@ -116,11 +127,41 @@ export const Navbar = () => {
                 </NavigationMenuList>
             </NavigationMenu>
 
-            <Button color="primary" variant={"destructive"}>
-                <Link href="/auth/register">
-                    Register
-                </Link>
-            </Button>
+            {user ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Avatar>
+                            <AvatarImage src={user.user_metadata.avatar_url} />
+                            <AvatarFallback>
+                                {user.user_metadata.full_name.slice(0, 2)}
+                            </AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                        <DropdownMenuLabel>My account</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                           <DropdownMenuItem>
+                                <User />
+                                <span>Profile</span>
+                           </DropdownMenuItem>
+                           <DropdownMenuItem onClick={logout}>
+                                <LogOut />
+                                <span>Logout</span>
+                           </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <div className="flex gap-4">
+                    <Link href="/auth/login">
+                        <Button variant="outline">Login</Button>
+                    </Link>
+                    <Link href="/auth/register">
+                        <Button variant="destructive">Register</Button>
+                    </Link>
+                </div>
+            )}
         </nav>
     )
 }
