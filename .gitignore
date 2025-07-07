@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.env 
+# why the hell wouldnt a default .gitignore include this?
+.env
