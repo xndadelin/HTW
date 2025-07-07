@@ -4,7 +4,8 @@ import { Navbar } from "@/components/Navbar";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { ModeToggle } from "@/components/ModeToggle";
 import { ClientProvider } from '@/components/providers/QueryClientProvider';
-import { Poppins } from 'next/font/google'
+import { Poppins } from 'next/font/google';
+import { Toaster } from '@/components/ui/sonner';
 
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <ClientProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={poppins.className}>
           <ThemeProvider
             attribute="class"
@@ -35,6 +36,7 @@ export default function RootLayout({
             <Navbar />
             <ModeToggle />
             {children}
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

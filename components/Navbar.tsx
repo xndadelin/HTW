@@ -8,6 +8,7 @@ import { getUser } from "@/utils/queries/user/getUser"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { User, LogOut } from "lucide-react"
+import { UserAvatar } from "./UserAvatar"
 import Loading from "@/components/auth/Loading"
 import { logout } from "@/utils/queries/user/logout"
 
@@ -118,11 +119,11 @@ export const Navbar = () => {
                         </NavigationMenuContent>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                        <Link href="/docs" legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                        <NavigationMenuLink asChild>
+                            <Link href="/docs" className={navigationMenuTriggerStyle()}>
                                 Documentation
-                            </NavigationMenuLink>
-                        </Link>
+                            </Link>
+                        </NavigationMenuLink>
                     </NavigationMenuItem>
                 </NavigationMenuList>
             </NavigationMenu>
@@ -130,12 +131,7 @@ export const Navbar = () => {
             {user ? (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Avatar>
-                            <AvatarImage src={user.user_metadata.avatar_url} />
-                            <AvatarFallback>
-                                {user.user_metadata.full_name.slice(0, 2)}
-                            </AvatarFallback>
-                        </Avatar>
+                        <UserAvatar size={40} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56">
                         <DropdownMenuLabel>My account</DropdownMenuLabel>
