@@ -4,7 +4,7 @@ const WaveLoading = () => {
   const appName = ["Hack", "The", "Way"];
   
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen w-screen">
       <div className="text-4xl font-bold flex space-x-4">
         {appName.map((word, wordIndex) => (
           <div key={wordIndex} className="flex">

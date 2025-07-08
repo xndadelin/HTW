@@ -44,6 +44,7 @@ const formSchema = z.object({
   ], { required_error: "Difficulty is required" }),
   categories: z.array(z.enum(CATEGORIES)).min(1, { message: "Select at least one category" }),
   link: z.string().url({ message: "Must be a valid URL" }).optional().or(z.literal('')),
+  flag: z.string().min(1, { message: "Flag is required" }),
 });
 
 export default function NewChallengeDialog({ children }: { children: React.ReactNode }) {
@@ -55,6 +56,7 @@ export default function NewChallengeDialog({ children }: { children: React.React
       difficulty: undefined,
       categories: [],
       link: '',
+      flag: '',
     },
   });
 
@@ -71,6 +73,7 @@ export default function NewChallengeDialog({ children }: { children: React.React
       difficulty: data.difficulty,
       categories: data.categories,
       link: data.link || null,
+      flag: data.flag,
       created_by: user.id,
     }]);
     if (error) {
@@ -190,6 +193,19 @@ export default function NewChallengeDialog({ children }: { children: React.React
                   <FormLabel htmlFor="link">Resource link (optional)</FormLabel>
                   <FormControl>
                     <Input {...field} id="link" placeholder="https://..." />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="flag"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="flag">Flag</FormLabel>
+                  <FormControl>
+                    <Input {...field} id="flag" placeholder="flag{...}" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

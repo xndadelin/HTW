@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { sha256 } from 'js-sha256';
+import supabase from "@/utils/supabase/client";
 
 interface Challenge {
   id: string;
@@ -71,8 +73,23 @@ export default function ChallengePage() {
     return icons[category as keyof typeof icons] || '📝';
   };
 
-  const handleFlagSubmit = (e: React.FormEvent) => {
+  const handleFlagSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
+    if (!flagInput) return;
+    const hashHex = sha256(flagInput);
+
+    const { data, error } = await supabase
+      .from("challenges")
+      .select("flag")
+      .eq("id", id)
+      .eq("flag", hashHex)
+      .single();
+
+    if (error || !data) {
+      alert("Incorrect flag. Please try again.");
+      return;
+    }
+    alert("Flag submitted successfully!");
   };
 
   if (loading) {
@@ -180,10 +197,18 @@ export default function ChallengePage() {
                 )}
               </p>
               <div className="flex w-full max-w-screen items-center mt-12">
-                <Input type='text' placeholder="Enter your flag here..." className="w-full" />
-                <Button type='submit' variant='outline' className="ml-2">
-                  Submit flag
-                </Button>
+                <form onSubmit={handleFlagSubmit} className="flex w-full items-center">
+                  <Input
+                    type='text'
+                    placeholder="Enter your flag here..."
+                    className="w-full"
+                    value={flagInput}
+                    onChange={e => setFlagInput(e.target.value)}
+                  />
+                  <Button type='submit' variant='outline' className="ml-2">
+                    Submit flag
+                  </Button>
+                </form>
               </div>
             </div>
             </div>
