@@ -4,6 +4,7 @@ export type Profile = {
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
+  role: string; 
 };
 
 export type Tables = {
