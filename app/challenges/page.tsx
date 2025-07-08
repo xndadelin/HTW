@@ -122,7 +122,7 @@ export default function Challenges() {
                             role="link"
                             tabIndex={0}
                             className="cursor-pointer block bg-background rounded-xl shadow-sm border border-border hover:shadow-md transition-shadow duration-200 overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[#EF4444]"
-                            onClick={() => window.location.href = `/challenge/${challenge.id}`}
+                            onClick={() => window.location.href = `/challenges/${challenge.id}`}
                             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { window.location.href = `/challenge/${challenge.id}`; } }}
                         >
                             <div className="p-6">
