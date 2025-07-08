@@ -15,6 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { toast } from 'sonner';
 
 const CATEGORIES = [
   "web",
@@ -57,8 +58,27 @@ export default function NewChallengeDialog({ children }: { children: React.React
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log(data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    const supabase = (await import('@/utils/supabase/client')).default;
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      toast.error('Not authenticated');
+      return;
+    }
+    const { error } = await supabase.from('challenges').insert([{
+      name: data.name,
+      description: data.description,
+      difficulty: data.difficulty,
+      categories: data.categories,
+      link: data.link || null,
+      created_by: user.id,
+    }]);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success('Challenge added!');
+      form.reset();
+    }
   }
 
   return (
@@ -115,8 +135,9 @@ export default function NewChallengeDialog({ children }: { children: React.React
                       {...field}
                       id="difficulty"
                       className="input border rounded px-2 py-1 w-full bg-background"
+                      value={field.value || ""}
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled>
                         Select difficulty
                       </option>
                       <option value="entry level">Entry level</option>
