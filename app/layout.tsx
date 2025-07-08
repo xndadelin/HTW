@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const { user, loading } = useGetUser();
-  console.log(user)
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={poppins.className}>
@@ -42,10 +42,10 @@ export default function RootLayout({
               {!user && <Navbar />}
               {user ? (
                 <SidebarProvider>
-                  <div className="flex items-center gap-2 p-4">
+                  <AppSidebar />
+                  <div className="flex gap-2 p-4">
                     <SidebarTrigger />
                   </div>
-                  <AppSidebar />
                   <ModeToggle />
                   {children}
                 </SidebarProvider>
