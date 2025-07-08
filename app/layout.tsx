@@ -1,3 +1,5 @@
+'use client'
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
@@ -6,12 +8,11 @@ import { ModeToggle } from "@/components/ModeToggle";
 import { ClientProvider } from '@/components/providers/QueryClientProvider';
 import { Poppins } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
-
-
-export const metadata: Metadata = {
-  title: "Hack The Way",
-  description: "Hack The Way is a community of cybersecurity enthusiasts."
-};
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import useGetUser from "@/lib/useGetUser";
+import WaveLoading from "@/components/auth/Loading";
+import Link from "next/link";
 
 const poppins = Poppins({
   weight: '400',
@@ -23,23 +24,42 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { user, loading } = useGetUser();
+  console.log(user)
   return (
-    <ClientProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={poppins.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar />
-            <ModeToggle />
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClientProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={poppins.className}>
+        {loading ? (
+          <WaveLoading />
+        ) : (
+          <ClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {!user && <Navbar />}
+              {user ? (
+                <SidebarProvider>
+                  <div className="flex items-center gap-2 p-4">
+                    <SidebarTrigger />
+                  </div>
+                  <AppSidebar />
+                  <ModeToggle />
+                  {children}
+                </SidebarProvider>
+              ) : (
+                <>
+                  <ModeToggle />
+                  {children}
+                </>
+              )}
+              <Toaster />
+            </ThemeProvider>
+          </ClientProvider>
+        )}
+      </body>
+    </html>
   );
 }

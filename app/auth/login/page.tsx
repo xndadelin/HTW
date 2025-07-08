@@ -4,8 +4,18 @@ import React from "react";
 import { Waypoints } from "lucide-react";
 import LoginForm from "@/components/auth/LoginForm";
 import OAuth from "@/components/auth/OAuth";
+import useGetUser from "@/lib/useGetUser";
+import WaveLoading from "@/components/auth/Loading";
 
 export default function LoginPage() {
+
+    const { user, loading } = useGetUser();
+    if (loading) return <WaveLoading />;
+    if (user) {
+        window.location.href = "/";
+        return null;
+    }
+
     return (
         <div className="container mx-auto flex flex-col my-10">
             <h1 className="text-5xl font-bold text-center mt-24">Login to your account</h1>
