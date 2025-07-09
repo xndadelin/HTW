@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { sha256 } from 'js-sha256';
 import supabase from "@/utils/supabase/client";
+import useGetUser from "@/lib/useGetUser";
 
 interface Challenge {
   id: string;
@@ -19,38 +20,48 @@ interface Challenge {
 
 export default function ChallengePage() {
   const { id } = useParams<{ id: string }>();
+  const { user, error: userError } = useGetUser();
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [flagInput, setFlagInput] = useState('');
+  const [flagCorrect, setFlagCorrect] = useState(false);
 
   useEffect(() => {
-    if (!id) {
-      setError(true);
-      setLoading(false);
-      return;
-    }
+    if (!id || !user?.id) return;
     let isMounted = true;
     (async () => {
       const supabase = (await import("@/utils/supabase/client")).default;
-      const { data, error } = await supabase
+      const { data: challengeData, error: challengeError } = await supabase
         .from("challenges")
         .select("*")
         .eq("id", id)
         .single();
       if (isMounted) {
-        if (error || !data) {
+        if (challengeError || !challengeData) {
           setError(true);
         } else {
-          setChallenge(data);
+          setChallenge(challengeData);
         }
         setLoading(false);
+      }
+      const { data: existing } = await supabase
+        .from("submissions")
+        .select("id, flag")
+        .eq("submitter", user.id)
+        .eq("challenge", id)
+        .eq("correct", true)
+        .maybeSingle();
+        
+      if (isMounted && existing) {
+        setFlagCorrect(true);
+        setFlagInput(existing.flag || '');
       }
     })();
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, user?.id]);
 
   const getDifficultyConfig = (difficulty: string) => {
     const configs = {
@@ -77,18 +88,38 @@ export default function ChallengePage() {
     e.preventDefault();
     if (!flagInput) return;
     const hashHex = sha256(flagInput);
-
+    const { data: existing } = await supabase
+      .from("submissions")
+      .select("id")
+      .eq("submitter", user?.id || null)
+      .eq("challenge", id)
+      .eq("correct", true)
+      .maybeSingle();
+    if (existing) {
+      setFlagCorrect(true);
+      alert("You have already solved this challenge!");
+      return;
+    }
     const { data, error } = await supabase
       .from("challenges")
       .select("flag")
       .eq("id", id)
       .eq("flag", hashHex)
       .single();
-
+    const submitter = user?.id || null;
+    await supabase.from("submissions").insert([
+      {
+        submitter,
+        correct: !!data,
+        challenge: id,
+        flag: flagInput,
+      }
+    ]);
     if (error || !data) {
       alert("Incorrect flag. Please try again.");
       return;
     }
+    setFlagCorrect(true);
     alert("Flag submitted successfully!");
   };
 
@@ -204,9 +235,15 @@ export default function ChallengePage() {
                     className="w-full"
                     value={flagInput}
                     onChange={e => setFlagInput(e.target.value)}
+                    disabled={flagCorrect}
                   />
-                  <Button type='submit' variant='outline' className="ml-2">
-                    Submit flag
+                  <Button
+                    type='submit'
+                    variant='outline'
+                    className={`ml-2 ${flagCorrect ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' : ''}`}
+                    disabled={flagCorrect}
+                  >
+                    {flagCorrect ? 'Completed' : 'Submit flag'}
                   </Button>
                 </form>
               </div>
