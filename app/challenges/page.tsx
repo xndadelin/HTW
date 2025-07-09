@@ -2,7 +2,7 @@
 
 import WaveLoading from "@/components/auth/Loading";
 import useGetUser from "@/lib/useGetUser";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Challenges() {
     const NewChallengeDialog = require("@/components/challenges/NewChallengeDialog").default;
@@ -10,6 +10,7 @@ export default function Challenges() {
     const isAdmin = user?.profile?.role === 'admin';
     const [challenges, setChallenges] = useState<any[]>([]);
     const [loadingChallenges, setLoadingChallenges] = useState(true);
+    const [solvedChallenges, setSolvedChallenges] = useState<string[]>([]);
 
     useEffect(() => {
         async function fetchChallenges() {
@@ -19,8 +20,14 @@ export default function Challenges() {
             if (!error) setChallenges(data || []);
             setLoadingChallenges(false);
         }
+        async function fetchSolved() {
+            const supabase = (await import("@/utils/supabase/client")).default;
+            const { data, error } = await supabase.from('submissions').select('challenge').eq('submitter', user?.id).eq('correct', true);
+            if (!error && data) setSolvedChallenges(data.map((s: any) => s.challenge));
+        }
         fetchChallenges();
-    }, []);
+        if (user?.id) fetchSolved();
+    }, [user?.id]);
 
     const getDifficultyColor = (difficulty: string) => {
         switch (difficulty) {
@@ -121,7 +128,10 @@ export default function Challenges() {
                             key={challenge.id}
                             role="link"
                             tabIndex={0}
-                            className="cursor-pointer block bg-background rounded-xl shadow-sm border border-border hover:shadow-md transition-shadow duration-200 overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[#EF4444]"
+                            className={
+                                `cursor-pointer block bg-background rounded-xl shadow-sm border border-border hover:shadow-md transition-shadow duration-200 overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[#EF4444] ` +
+                                (solvedChallenges.includes(challenge.id) ? 'border-green-500' : '')
+                            }
                             onClick={() => window.location.href = `/challenges/${challenge.id}`}
                             onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { window.location.href = `/challenge/${challenge.id}`; } }}
                         >
