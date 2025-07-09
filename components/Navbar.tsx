@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/button"
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 import { useQuery } from "react-query"
 import { getUser } from "@/utils/queries/user/getUser"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { User, LogOut } from "lucide-react"
-import { UserAvatar } from "./UserAvatar"
 import Loading from "@/components/auth/Loading"
 import { logout } from "@/utils/queries/user/logout"
 
@@ -130,9 +128,7 @@ export const Navbar = () => {
 
             {user ? (
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <UserAvatar size={40} />
-                    </DropdownMenuTrigger>
+                    <DropdownMenuTrigger />
                     <DropdownMenuContent className="w-56">
                         <DropdownMenuLabel>My account</DropdownMenuLabel>
                         <DropdownMenuSeparator />

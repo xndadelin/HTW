@@ -91,7 +91,15 @@ export function AppSidebar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton>
-                    <User2 />
+                    {user.user_metadata?.avatar_url ? (
+                      <img
+                        src={user.user_metadata.avatar_url}
+                        alt="avatar"
+                        className="w-7 h-7 rounded-sm object-cover mr-2"
+                      />
+                    ) : (
+                      <User2 />
+                    )}
                     <span className="ml-2">{user.user_metadata?.full_name}</span>
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>

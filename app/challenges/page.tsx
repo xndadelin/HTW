@@ -68,7 +68,7 @@ export default function Challenges() {
     if (loading) return <WaveLoading />;
 
     if (!user) {
-        if (typeof window !== "undefined") window.location.href = "/auth/login";
+        if (typeof window !== "undefined") window.location.href = "/unauthorized";
         return null;
     }
 

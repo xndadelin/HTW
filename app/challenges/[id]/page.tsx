@@ -28,7 +28,10 @@ export default function ChallengePage() {
   const [flagCorrect, setFlagCorrect] = useState(false);
 
   useEffect(() => {
-    if (!id || !user?.id) return;
+    if (!id || !user?.id) {
+      if (typeof window !== "undefined" && !user?.id) window.location.href = "/unauthorized";
+      return;
+    }
     let isMounted = true;
     (async () => {
       const supabase = (await import("@/utils/supabase/client")).default;

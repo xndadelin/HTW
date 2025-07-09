@@ -69,6 +69,12 @@ export default function WriteupsPage() {
     }
   };
 
+  if (loading) return null;
+  if (!user) {
+    if (typeof window !== "undefined") window.location.href = "/unauthorized";
+    return null;
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8 mt-16">
